@@ -1,0 +1,8 @@
+﻿<?xml version = "1.0" encoding = "UTF-8"?>
+<mapinfo
+    displayName = "Mythical Chaos"
+    detailsText = "This FFA map allows zero micro, full macro focused gameplay. Inspired by Survival Chaos WC3 map."
+    loadDetailsText = "You cannot control your units. But your choises in upgrades and minor gods matter!"
+    imagepath = "resources\norse\static_color\technologies\call_of_valhalla_icon.png" loadBackground="game\ui_myth\resources\campaign\spotlights\fott\fott07_spotlight.png"
+    landmap="">
+</mapinfo>

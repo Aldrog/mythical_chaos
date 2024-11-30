@@ -1,0 +1,14 @@
+# Build artifacts
+/random_maps/*.xs
+
+# Python cache
+__pycache__
+
+# Auto-generated
+/trigger/trigtemp.xs
+
+# Unrelated game directories
+/mods/
+/replays/
+/savegames/
+/users/

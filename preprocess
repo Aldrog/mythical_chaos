@@ -1,0 +1,83 @@
+#!/bin/env python
+
+import os
+import re
+import sys
+from argparse import ArgumentParser, ArgumentTypeError
+from contextlib import contextmanager
+from io import TextIOWrapper
+from pathlib import Path
+
+from preprocessor import Preprocessor
+
+
+@contextmanager
+def open_or_fallback(path: None | Path, mode: str):
+    if path and str(path) != "-":
+        if path.exists() and not path.is_file():
+            raise ValueError(f"{path} path already exists and is not a file")
+        if not path.parent.exists() or not path.parent.is_dir():
+            raise ValueError(f"cannot create {path}: directory doesn't exist")
+        file = path.open(mode)
+        assert isinstance(file, TextIOWrapper)
+        should_close = True
+    else:
+        fallback = sys.stdin if mode == "r" else sys.stdout
+        if not isinstance(fallback, TextIOWrapper):
+            filename = "stdin" if mode == "r" else "stdout"
+            raise RuntimeError(f"{filename} is not available")
+        file = fallback
+        should_close = False
+    try:
+        yield file
+    finally:
+        if should_close:
+            file.close()
+
+
+def key_value(string: str) -> tuple[str, str]:
+    kv = string.split("=", maxsplit=1)
+    if not kv or len(kv) > 2:
+        raise ArgumentTypeError(
+            f"expected string in form 'key[=value]', got '{string}'"
+        )
+    if len(kv) == 1:
+        key, value = kv[0], ""
+    else:
+        key, value = kv
+    if not re.match(r"^[a-zA-Z_][a-zA-Z_0-9]*$", key):
+        raise ArgumentTypeError(f"'{key}' is not a valid symbol")
+    return (key, value)
+
+
+def main():
+    parser = ArgumentParser(prog="preprocess", description="XS script preprocessor")
+    parser.add_argument(
+        "-D",
+        "--define",
+        action="append",
+        type=key_value,
+        metavar="KEY[=VALUE]",
+        default=[],
+    )
+    parser.add_argument("-o", "--output", action="store", type=Path)
+    parser.add_argument("input", action="store", type=Path)
+    args = parser.parse_args()
+
+    defines = {}
+    for key, value in args.define:
+        defines[key] = value
+
+    with (
+        open_or_fallback(args.input, "r") as input_file,
+        open_or_fallback(args.output, "w") as output_file,
+    ):
+        if args.input and args.input != "-":
+            current_directory = os.path.dirname(args.input)
+        else:
+            current_directory = os.getcwd()
+        preprocessor = Preprocessor(defines, input_file, output_file, current_directory)
+        preprocessor.run()
+
+
+main()
