@@ -92,6 +92,7 @@ void removeInvalidUnits()
 void mergeNearbyArmies()
 {
     const float cDistanceThreshold = 15;
+    const int cMaxArmySize = 50;
     for(int i = 0; i < armies.size() - 1; i++)
     {
         Army army1 = armies[i];
@@ -103,6 +104,9 @@ void mergeNearbyArmies()
                 continue;
             if(trUnitDistanceToUnitID(army2.unitIDs[0]) > cDistanceThreshold)
                 continue;
+            if(army1.unitIDs.size() + army2.unitIDs.size() > cMaxArmySize)
+                continue;
+
             if(army1.routeIndex <= army2.routeIndex)
             {
                 for(int k = 0; k < army2.unitIDs.size(); k++)
