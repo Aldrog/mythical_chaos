@@ -86,6 +86,7 @@ void setTrainingOptions(int player = 0)
         trUnforbidProtounit(player, "ChampionOfFreyr");
         trModifyProtounitResource("ChampionOfFreyr", "gold", player, 0, 3.0, 2);
         trModifyProtounitData("ChampionOfFreyr", player, 6, 0, 1);
+        trModifyProtounitData("ChampionOfFreyr", player, 3, 61, 0);
         trModifyProtounitAction("ChampionOfFreyr", "HandAttack", player, 2, -8.0, 0);
         trProtounitAddTrain("TownCenter", player, "ChampionOfFreyr", 0, 3);
     }
