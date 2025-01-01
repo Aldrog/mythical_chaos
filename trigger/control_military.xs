@@ -7,6 +7,7 @@ class Army
     int routeIndex = 0;
     int[] unitIDs = default;
     int player = 0;
+    int lastAttackS = 0;
 
     void selectUnits()
     {
@@ -19,7 +20,17 @@ class Army
 
     void attack()
     {
+        const int cMinAttackDelayS = 3;
+        int time = xsGetTime();
+        if(time < lastAttackS + cMinAttackDelayS)
+            return;
+        lastAttackS = time;
+
         selectUnits();
+        if (trUnitIsAttacking()) {
+            trUnitSelectClear();
+            return;
+        }
         vector attackTarget = attackRoute[routeIndex % attackRoute.size()];
         trUnitMoveToPoint(attackTarget.x, attackTarget.y, attackTarget.z,
                           -1, true);
@@ -31,6 +42,7 @@ class Army
         {
             routeIndex++;
         }
+        trUnitSelectClear();
     }
 
     int removeUnit(int i = 0)
@@ -113,8 +125,7 @@ void mergeNearbyArmies()
 }
 
 rule _Control_Military
-minInterval 2
-maxInterval 5
+highFrequency
 active
 {
     removeInvalidUnits();
